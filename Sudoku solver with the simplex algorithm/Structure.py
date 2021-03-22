@@ -1,12 +1,5 @@
 #!/usr/bin/env python3
 
-def printit(table):
-  for i in range(len(table)):
-    for j in range(len(table[i])):
-      print(table[i][j], end='')
-    print()
-  print()
-
 class Structure:
   def __init__(self, grid):
     self.Grid = grid
@@ -217,24 +210,3 @@ class Structure:
     else:
       print("Not a solution")
 
-def read_the_grid():
-  # Assuming Grid.txt file exists in the same directory
-  lines = open("Grid.txt").read().strip().split('\n')
-  grid = [line.split(' ') for line in lines] 
-
-  assert(len(grid) == 9)
-  for i in range(9):
-    assert(len(grid[i]) == 9)
-    for j in range(9):
-      grid[i][j] = int(grid[i][j])
-
-  return grid
-
-if __name__ == '__main__':
-  Grid = read_the_grid()
-
-  struct = Structure(Grid)
-  struct.solve()
-  #struct.retrive_solution()
-  struct.check_solution()
-  print(f"waited value == {struct.WaitedAnswer}, max value = {struct.MaxValue}") 
