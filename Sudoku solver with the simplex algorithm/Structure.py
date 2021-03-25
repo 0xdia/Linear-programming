@@ -39,44 +39,54 @@ class Structure:
       self.Table[j+9][x] = 1
       self.Table[(i//3)*3+j//3+18][x] = 1
 
+    self.Table = [[1 for i in range(len(self.empty))]] + self.Table
 
-    # setting the constraints <= 9, and the constraints >= 1
-    t1 = [[0 for _ in range(len(self.empty))] for i in range(len(self.empty))]
-    t2 = [[0 for _ in range(len(self.empty))] for i in range(len(self.empty))]
+    # add the constraints <= 9
+    constraints = [ [0 for i in range(len(self.empty))] 
+                       for j in range(len(self.empty)) ]
 
-    for i in range(len(t1)):
-      t1[i][i] = t2[i][i] = 1
+    for i in range(len(self.empty)):
+      constraints[i][i] = 1
 
-    self.Table += (t1 + t2)
-    # the dimension of the matrix
-    L = len(self.Table)
+    self.Table += constraints
 
-    # setting the slack variables
-    slack_vars = [[0 for _ in range(L)] for i in range(L)]
-    for i in range(len(slack_vars)):
-      slack_vars[i][i] = 1
+    # add the constraints >= 1
+    _constraints = [ [0 for i in range(len(self.empty))]
+                        for j in range(len(self.empty)) ]
 
-    for i in range(L):
-      self.Table[i] += slack_vars[i]
+    for i in range(len(self.empty)):
+      _constraints[i][i] = 1
 
-    # setting the artificial variables
-    a = [[0 for _ in range(len(self.empty))] for i in range(27)] 
-    b = [[0 for _ in range(len(self.empty))] for i in range(len(self.empty))]
-    c = [[0 for _ in range(len(self.empty))] for i in range(len(self.empty))]
+    self.Table += _constraints
 
-    for i in range(len(c)):
-      c[i][i] = -1
+    # adding the identity matrix (some slack vars and artificial vars)
+    identity = [ [0 for i in range(28+2*len(self.empty))]
+                    for j in range(28+2*len(self.empty)) ]
 
-    temp = a+b+c
+    for i in range(28+2*len(self.empty)):
+      identity[i][i] = 1
 
     for i in range(len(self.Table)):
-      self.Table[i] += temp[i]
-    
-    # completing b vector
-    self.B += [9 for _ in range(len(self.empty))] + [1 for _ in range(len(self.empty))]
+      self.Table[i] += identity[i]
 
-    # setting c vector
-    self.C =  [1 for _ in range(len(self.empty))] + [0 for _ in range(27 + 3*len(self.empty))]
+    # adding the remaining of slack vars
+    remaining = [[0 for i in range(len(self.empty))]
+                     for j in range(28+2*len(self.empty))]
+
+    print(len(remaining))
+    print(len(remaining[-1]))
+
+    for i in range(28+len(self.empty), len(remaining)):
+      remaining[i][i-28-len(self.empty)] = 1
+
+    for i in range(len(self.Table)):
+      self.Table[i] += remaining[i]
+
+    # completing B
+    self.B = [self.WaitedAnswer] + self.B + [9 for _ in range(len(self.empty))] + [1 for _ in range(len(self.empty))]
+    
+    # setting C
+    self.C = [1 for i in range(len(self.empty))]+[0 for i in range(28+2*len(self.empty))]
 
 
   def print_table(self):

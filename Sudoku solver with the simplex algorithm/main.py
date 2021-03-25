@@ -8,6 +8,6 @@ if __name__ == '__main__':
 
   struct = Structure(Grid)
   struct.solve()
-  #struct.retrive_solution()
+  struct.retrive_solution()
   #struct.check_solution()
-  print(f"waited value == {struct.WaitedAnswer}, max value = {struct.MaxValue}") 
+  #print(f"waited value == {struct.WaitedAnswer}, max value = {struct.MaxValue}") 
