@@ -39,8 +39,6 @@ class Structure:
       self.Table[j+9][x] = 1
       self.Table[(i//3)*3+j//3+18][x] = 1
 
-    self.Table = [[1 for i in range(len(self.empty))]] + self.Table
-
     # add the constraints <= 9
     constraints = [ [0 for i in range(len(self.empty))] 
                        for j in range(len(self.empty)) ]
@@ -60,10 +58,10 @@ class Structure:
     self.Table += _constraints
 
     # adding the identity matrix (some slack vars and artificial vars)
-    identity = [ [0 for i in range(28+2*len(self.empty))]
-                    for j in range(28+2*len(self.empty)) ]
+    identity = [ [0 for i in range(27+2*len(self.empty))]
+                    for j in range(27+2*len(self.empty)) ]
 
-    for i in range(28+2*len(self.empty)):
+    for i in range(27+2*len(self.empty)):
       identity[i][i] = 1
 
     for i in range(len(self.Table)):
@@ -71,13 +69,10 @@ class Structure:
 
     # adding the remaining of slack vars
     remaining = [[0 for i in range(len(self.empty))]
-                     for j in range(28+2*len(self.empty))]
+                     for j in range(27+2*len(self.empty))]
 
-    print(len(remaining))
-    print(len(remaining[-1]))
-
-    for i in range(28+len(self.empty), len(remaining)):
-      remaining[i][i-28-len(self.empty)] = 1
+    for i in range(27+len(self.empty), len(remaining)):
+      remaining[i][i-27-len(self.empty)] = -1
 
     for i in range(len(self.Table)):
       self.Table[i] += remaining[i]
@@ -86,8 +81,23 @@ class Structure:
     self.B = [self.WaitedAnswer] + self.B + [9 for _ in range(len(self.empty))] + [1 for _ in range(len(self.empty))]
     
     # setting C
-    self.C = [1 for i in range(len(self.empty))]+[0 for i in range(28+2*len(self.empty))]
+    self.C = [1 for i in range(len(self.empty))]+[0 for i in range(27+3*len(self.empty))]
 
+    for i in range(len(self.C)):
+      if self.C[i] == 0:
+        print('.', end='')
+      else:
+        print(self.C[i], end='')
+    print()
+
+    for i in range(len(self.Table)):
+      for j in range(len(self.Table[i])):
+        if self.Table[i][j] == 0:
+          print('.', end='')
+        else:
+          print(self.Table[i][j], end='')
+      print()
+    print()
 
   def print_table(self):
     print(end='   ')
@@ -101,7 +111,18 @@ class Structure:
       print(end=f' {self.B[i]}\n')
 
   def solve(self):
+    iteration = 0
     while True:
+      print(f'at {iteration}')
+      iteration += 1
+      done = False
+      for i in range(len(self.B)):
+        if self.B[i] < 0:
+          done = True
+          break
+      if done:
+        break
+
       indx_max = self.C.index(max(self.C)) 
       if self.C[indx_max] <= 0:
         break
